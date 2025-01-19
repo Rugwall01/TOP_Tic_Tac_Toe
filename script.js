@@ -62,8 +62,8 @@ const GameBoard = (function () {
     };
 
     const checkWinner = () => { 
-        const winPatterns = [
 
+        const winPatterns = [
             [[0, 0], [0, 1], [0, 2]],
             [[1, 0], [1, 1], [1, 2]],
             [[2, 0], [2, 1], [2, 2]],
@@ -76,18 +76,19 @@ const GameBoard = (function () {
             [[0, 2], [1, 1], [2, 0]]
         ];
 
-        for (const pattern of winPatterns) {
+        for (let pattern of winPatterns) {
             const [a, b, c] = pattern;
-            const markerA = board[a[0]a[1]];
-            const markerB = board[b[0]b[1]];
-            const markerC = board[c[0]c[1]];
+            const markerA = board[a[0]][a[1]];
+            const markerB = board[b[0]][b[1]];
+            const markerC = board[c[0]][c[1]];
 
             if (markerA !== 0 && markerA === markerB && markerB === markerC){
                 return markerA;
             }
+            return null;
 
         }
-        return null;
+        
     };
     return { getBoard, placeMarker, checkWinner };
 })();
@@ -121,22 +122,61 @@ const GameController = (function () {
         }
     };
 
-    return { nextMove, playMove, getCurrentPlayer };
+    return { nextMove, playMove, getCurrentPlayer, getMovesMade: () => movesMade };
 })();
+
+
 
 const GameFlow = function () {
     console.log("Welcome to Tic-Tac-Toe!");
     console.log("Player 1 (X) goes first. Enter a number (1-9) to place your marker.");
 
-    for (let i = 0; i < 9; i++) {
-        
-        console.log(`Current Turn: ${GameController.getCurrentPlayer().getName()}`);
-        let move = GameController.nextMove();
-        GameController.playMove(move);
-        console.table(GameBoard.getBoard());        
-    }
+    const playTurn = () => {
+        console.table(GameBoard.getBoard());
 
-    console.log("Game over!");
+        if (GameController.getMovesMade() >= 9) {
+            console.log("It's a draw!");
+            return;
+        }
+
+        console.log(`Current Turn: ${GameController.getCurrentPlayer().getName()}`);
+
+        let move = GameController.nextMove();
+
+        const winner = GameBoard.checkWinner();
+        
+        // if (GameController.playMove(move)) {
+        //     if (winner) {
+        //         console.table(GameBoard.getBoard());
+        //         console.log(`Game over! ${winner} wins!`);
+        //         return;
+        //     }
+        // };
+        
+        if (!winner) playTurn();
+        if (winner) {
+            console.table(GameBoard.getBoard());
+            console.log(`Game over! ${winner} wins!`);
+            return;
+        };
+
+    };
+
+    playTurn();
+
+
+
+    // for (let i = 0; i < 9; i++) {
+        
+    //     console.log(`Current Turn: ${GameController.getCurrentPlayer().getName()}`);
+    //     let move = GameController.nextMove();
+    //     GameController.playMove(move);
+    //     console.table(GameBoard.getBoard());        
+    // }
+
+    // console.log("Game over!");
+
+
 };
 
 GameFlow();
