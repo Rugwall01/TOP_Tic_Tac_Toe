@@ -48,6 +48,7 @@ const player2 = (function () {
         getMarker: () => marker
     };
 })();
+
 const GameBoard = (function () {
     const board = Array(3).fill(null).map(() => Array(3).fill(0));
 
@@ -59,7 +60,36 @@ const GameBoard = (function () {
         }
         return false;
     };
-    return { getBoard, placeMarker };
+
+    const checkWinner = () => { 
+        const winPatterns = [
+
+            [[0, 0], [0, 1], [0, 2]],
+            [[1, 0], [1, 1], [1, 2]],
+            [[2, 0], [2, 1], [2, 2]],
+            
+            [[0, 0], [1, 0], [2, 0]],
+            [[0, 1], [1, 1], [2, 1]],
+            [[0, 2], [1, 2], [2, 2]],
+            
+            [[0, 0], [1, 1], [2, 2]],
+            [[0, 2], [1, 1], [2, 0]]
+        ];
+
+        for (const pattern of winPatterns) {
+            const [a, b, c] = pattern;
+            const markerA = board[a[0]a[1]];
+            const markerB = board[b[0]b[1]];
+            const markerC = board[c[0]c[1]];
+
+            if (markerA !== 0 && markerA === markerB && markerB === markerC){
+                return markerA;
+            }
+
+        }
+        return null;
+    };
+    return { getBoard, placeMarker, checkWinner };
 })();
 
 
