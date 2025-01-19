@@ -1,31 +1,3 @@
-// function Gameboard() {
-//     const rows = 3;
-//     const columns = 3;
-//     const gameBoard = [];
-
-//     for(i = 0; i < rows; i++) {
-//         gameBoard[i] = [];
-//         for(j = 0; j < columns; j++) {
-//             gameBoard[i].push(cellArea());
-//         }
-//     }
-
-//     const retBoard = () => gameBoard;
-// };
-
-
-
-
-
-// const marker = (column , player) => {
-
-//     const freeCell = gameBoard.filter((row) => row[column].getValue() === 0).map((row) => row[column]);
-
-//     if(!freeCell.length) {return};
-    
-//     const cell = cellArea();
-
-// }
 
 
 
@@ -53,9 +25,9 @@ const GameBoard = (function () {
     const board = Array(3).fill(null).map(() => Array(3).fill(0));
 
     const getBoard = () => board;
-    const placeMarker = (row, col, marker) => {
-        if (board[row][col] === 0) {
-            board[row][col] = marker;
+    const placeMarker = (col, row, marker) => {
+        if (board[col][row] === 0) {
+            board[col][row] = marker;
             return true;
         }
         return false;
@@ -85,9 +57,8 @@ const GameBoard = (function () {
             if (markerA !== 0 && markerA === markerB && markerB === markerC){
                 return markerA;
             }
-            return null;
-
         }
+        return null;
         
     };
     return { getBoard, placeMarker, checkWinner };
@@ -111,18 +82,19 @@ const GameController = (function () {
     };
 
     const playMove = (cell) => {
-        const row = Math.floor((cell - 1) / 3);
-        const col = (cell - 1) % 3;
+        const col = Math.floor((cell - 1) / 3);
+        const row = (cell - 1) % 3;
         const currentPlayer = getCurrentPlayer();
 
-        if (GameBoard.placeMarker(row, col, currentPlayer.getMarker())) {
+        if (GameBoard.placeMarker(col, row, currentPlayer.getMarker())) {
 
             console.log(`Placed ${currentPlayer.getMarker()} at (${row}, ${col})`);
             movesMade++;
-        } else if (GameBoard.placeMarker(row, col, currentPlayer.getMarker()) !== 0) {
+
+        } else if (GameBoard.placeMarker(col, row, currentPlayer.getMarker()) !== 0  && !GameBoard.checkWinner()) {
+
             console.log("Can't place there! That spot is already taken.");
-        } else if (GameBoard.checkWinner) {
-            console.log(`Game over! ${winner} wins!`);
+
         }
     };
 
@@ -145,13 +117,11 @@ const GameFlow = function () {
 
         console.log(`Current Turn: ${GameController.getCurrentPlayer().getName()}`);
 
+
         let move = GameController.nextMove();
-
-        GameController.playMove(move);
-
-        const winner = GameBoard.checkWinner();
         
         if (GameController.playMove(move)) {
+            const winner = GameBoard.checkWinner();
             if (winner !== null) {
                 console.table(GameBoard.getBoard());
                 console.log(`Game over! ${winner} wins!`);
@@ -159,33 +129,11 @@ const GameFlow = function () {
             }
         };
 
-        if (!winner) playTurn();
-        
-    //     if (GameController.playMove(move)){
-    //     if (!winner) playTurn();
-    //     if (winner) {
-    //         console.table(GameBoard.getBoard());
-    //         console.log(`Game over! ${winner} wins!`);
-    //         return;
-    //     };
-    // };
+        playTurn();
 
     };
 
     playTurn();
-
-
-
-    // for (let i = 0; i < 9; i++) {
-        
-    //     console.log(`Current Turn: ${GameController.getCurrentPlayer().getName()}`);
-    //     let move = GameController.nextMove();
-    //     GameController.playMove(move);
-    //     console.table(GameBoard.getBoard());        
-    // }
-
-    // console.log("Game over!");
-
 
 };
 
