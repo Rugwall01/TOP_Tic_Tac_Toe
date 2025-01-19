@@ -103,7 +103,8 @@ const GameController = (function () {
         let move;
         while (true) {
             move = Number(prompt("Enter a grid cell (1-9): "));
-            if (!isNaN(move) && move >= 1 && move <= 9) break;
+
+            if (!isNaN(move) || (move >= 1 && move <= 9)) break;
             console.log("Invalid input. Please enter a number between 1 and 9.");
         }
         return move;
@@ -115,10 +116,13 @@ const GameController = (function () {
         const currentPlayer = getCurrentPlayer();
 
         if (GameBoard.placeMarker(row, col, currentPlayer.getMarker())) {
+
             console.log(`Placed ${currentPlayer.getMarker()} at (${row}, ${col})`);
             movesMade++;
-        } else {
+        } else if (GameBoard.placeMarker(row, col, currentPlayer.getMarker()) !== 0) {
             console.log("Can't place there! That spot is already taken.");
+        } else if (GameBoard.checkWinner) {
+            console.log(`Game over! ${winner} wins!`);
         }
     };
 
@@ -143,22 +147,28 @@ const GameFlow = function () {
 
         let move = GameController.nextMove();
 
+        GameController.playMove(move);
+
         const winner = GameBoard.checkWinner();
         
-        // if (GameController.playMove(move)) {
-        //     if (winner) {
-        //         console.table(GameBoard.getBoard());
-        //         console.log(`Game over! ${winner} wins!`);
-        //         return;
-        //     }
-        // };
-        
-        if (!winner) playTurn();
-        if (winner) {
-            console.table(GameBoard.getBoard());
-            console.log(`Game over! ${winner} wins!`);
-            return;
+        if (GameController.playMove(move)) {
+            if (winner !== null) {
+                console.table(GameBoard.getBoard());
+                console.log(`Game over! ${winner} wins!`);
+                return;
+            }
         };
+
+        if (!winner) playTurn();
+        
+    //     if (GameController.playMove(move)){
+    //     if (!winner) playTurn();
+    //     if (winner) {
+    //         console.table(GameBoard.getBoard());
+    //         console.log(`Game over! ${winner} wins!`);
+    //         return;
+    //     };
+    // };
 
     };
 
