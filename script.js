@@ -1,107 +1,78 @@
-
-
-
-
-
 const player1 = (function () {
-    const name = "player1Name";
+    const name = "Player 1";
     const marker = "X";
     return {
-        getName: () => name, 
+        getName: () => name,
         getMarker: () => marker
     };
 })();
 
 const player2 = (function () {
-    const name = "player2Name";
+    const name = "Player 2";
     const marker = "O";
     return {
-        getName: () => name, 
+        getName: () => name,
         getMarker: () => marker
     };
 })();
 
 const GameBoard = (function () {
-    const board = Array(3).fill(null).map(() => Array(3).fill(0));
+    const gameBoard = Array(9).fill('');
 
-    const getBoard = () => board;
-    const placeMarker = (col, row, marker) => {
-        if (board[col][row] === 0) {
-            board[col][row] = marker;
+    const getBoard = () => gameBoard;
+
+    const placeMarker = (cell, marker) => {
+        if (gameBoard[cell - 1] === '') {
+            gameBoard[cell - 1] = marker;
             return true;
         }
         return false;
     };
 
-    const checkWinner = () => { 
-
-        const winPatterns = [
-            [[0, 0], [0, 1], [0, 2]],
-            [[1, 0], [1, 1], [1, 2]],
-            [[2, 0], [2, 1], [2, 2]],
-            
-            [[0, 0], [1, 0], [2, 0]],
-            [[0, 1], [1, 1], [2, 1]],
-            [[0, 2], [1, 2], [2, 2]],
-            
-            [[0, 0], [1, 1], [2, 2]],
-            [[0, 2], [1, 1], [2, 0]]
+    const checkWinner = () => {
+        const winningPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+            [0, 4, 8], [2, 4, 6]
         ];
 
-        for (let pattern of winPatterns) {
+        for (let pattern of winningPatterns) {
             const [a, b, c] = pattern;
-            const markerA = board[a[0]][a[1]];
-            const markerB = board[b[0]][b[1]];
-            const markerC = board[c[0]][c[1]];
-
-            if (markerA !== 0 && markerA === markerB && markerB === markerC){
-                return markerA;
+            if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                return gameBoard[a];
             }
         }
+
+        if (gameBoard.every((cell) => cell !== '')) {
+            return 'draw';
+        }
+
         return null;
-        
     };
+
     return { getBoard, placeMarker, checkWinner };
 })();
 
-
 const GameController = (function () {
+    let currentPlayer = player1;
     let movesMade = 0;
 
-    const getCurrentPlayer = () => (movesMade % 2 === 0 ? player1 : player2);
+    const getCurrentPlayer = () => currentPlayer;
 
-    const nextMove = () => {
-        let move;
-        while (true) {
-            move = Number(prompt("Enter a grid cell (1-9): "));
-
-            if (!isNaN(move) || (move >= 1 && move <= 9)) break;
-            console.log("Invalid input. Please enter a number between 1 and 9.");
-        }
-        return move;
+    const switchPlayer = () => {
+        currentPlayer = currentPlayer === player1 ? player2 : player1;
     };
 
     const playMove = (cell) => {
-        const col = Math.floor((cell - 1) / 3);
-        const row = (cell - 1) % 3;
-        const currentPlayer = getCurrentPlayer();
-
-        if (GameBoard.placeMarker(col, row, currentPlayer.getMarker())) {
-
-            console.log(`Placed ${currentPlayer.getMarker()} at (${row}, ${col})`);
+        if (GameBoard.placeMarker(cell, currentPlayer.getMarker())) {
             movesMade++;
-
-        } else if (GameBoard.placeMarker(col, row, currentPlayer.getMarker()) !== 0  && !GameBoard.checkWinner()) {
-
-            console.log("Can't place there! That spot is already taken.");
-
+            return true;
         }
+        return false;
     };
 
-    return { nextMove, playMove, getCurrentPlayer, getMovesMade: () => movesMade };
+    return { getCurrentPlayer, switchPlayer, playMove, getMovesMade: () => movesMade };
 })();
-
-
 
 const GameFlow = function () {
     console.log("Welcome to Tic-Tac-Toe!");
@@ -109,33 +80,33 @@ const GameFlow = function () {
 
     const playTurn = () => {
         console.table(GameBoard.getBoard());
+        // console.table(GameBoard.getBoard().slice(0, 3));
+        // console.table(GameBoard.getBoard().slice(3, 6));
+        // console.table(GameBoard.getBoard().slice(6, 9));
 
-        if (GameController.getMovesMade() >= 9) {
-            console.log("It's a draw!");
+        let move = Number(prompt(`${GameController.getCurrentPlayer().getName()}, enter a grid cell (1-9):`));
+        while (isNaN(move) || move < 1 || move > 9 || !GameBoard.placeMarker(move, GameController.getCurrentPlayer().getMarker())) {
+            move = Number(prompt("Invalid input or spot taken. Enter a valid grid cell (1-9):"));
+        }
+
+        GameController.playMove(move);
+
+        let result = GameBoard.checkWinner();
+        if (result) {
+            console.table(GameBoard.getBoard());
+            if (result === 'draw') {
+                console.log("It's a draw!");
+            } else {
+                console.log(`Game over! ${result} wins!`);
+            }
             return;
         }
 
-        console.log(`Current Turn: ${GameController.getCurrentPlayer().getName()}`);
-
-
-        let move = GameController.nextMove();
-        
-        if (GameController.playMove(move)) {
-            const winner = GameBoard.checkWinner();
-            if (winner !== null) {
-                console.table(GameBoard.getBoard());
-                console.log(`Game over! ${winner} wins!`);
-                return;
-            }
-        };
-
+        GameController.switchPlayer();
         playTurn();
-
     };
 
     playTurn();
-
 };
 
 GameFlow();
-
