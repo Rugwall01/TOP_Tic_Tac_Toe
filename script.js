@@ -1,4 +1,10 @@
-const player1 = (function () {
+const createTitle = (title) => {
+    const titleElem = document.createElement('h1');
+    titleElem.textContent = title;
+    document.body.appendChild(titleElem);
+};
+
+const player1 = (() => {
     const name = "Player 1";
     const marker = "X";
     return {
@@ -7,7 +13,7 @@ const player1 = (function () {
     };
 })();
 
-const player2 = (function () {
+const player2 = (() => {
     const name = "Player 2";
     const marker = "O";
     return {
@@ -16,17 +22,44 @@ const player2 = (function () {
     };
 })();
 
-const GameBoard = (function () {
+const GameBoard = (() => {
     const gameBoard = Array(9).fill('');
+    let gameOver = false;
 
-    const getBoard = () => gameBoard;
+    const makeBoard = () => {
+        const boardUI = document.createElement('div');
+        boardUI.style.display = 'grid';
+        boardUI.classList.add('game-board');
+        return boardUI;
+    };
 
-    const placeMarker = (cell, marker) => {
-        if (gameBoard[cell - 1] === '') {
-            gameBoard[cell - 1] = marker;
-            return true;
-        }
-        return false;
+    const makeSquare = (squareNumber) => {
+        const boardSquare = document.createElement('div');
+        boardSquare.classList.add('game-square');
+
+        boardSquare.addEventListener('click', (e) => {
+            if (gameOver) return; 
+
+            const target = e.target;
+            const currentMarker = GameController.getCurrentPlayer().getMarker();
+
+            target.textContent = currentMarker;
+            gameBoard[squareNumber] = currentMarker;
+
+            let result = checkWinner();
+            if (result) {
+                gameOver = true;
+                setTimeout(() => {
+                    alert(result === 'draw' ? "It's a draw!" : `${result} wins!`);
+                    GameController.resetGame();
+                }, 100);
+                return;
+            }
+
+            GameController.switchPlayer();
+        }, { once: true });
+
+        return boardSquare;
     };
 
     const checkWinner = () => {
@@ -43,70 +76,42 @@ const GameBoard = (function () {
             }
         }
 
-        if (gameBoard.every((cell) => cell !== '')) {
-            return 'draw';
-        }
-
-        return null;
+        return gameBoard.every(cell => cell !== '') ? 'draw' : null;
     };
 
-    return { getBoard, placeMarker, checkWinner };
+    const resetBoard = () => {
+        gameBoard.fill('');
+        gameOver = false;
+    };
+
+    return { gameBoard, makeBoard, makeSquare, checkWinner, resetBoard };
 })();
 
-const GameController = (function () {
+const GameController = (() => {
     let currentPlayer = player1;
-    let movesMade = 0;
 
     const getCurrentPlayer = () => currentPlayer;
-
     const switchPlayer = () => {
         currentPlayer = currentPlayer === player1 ? player2 : player1;
     };
 
-    const playMove = (cell) => {
-        if (GameBoard.placeMarker(cell, currentPlayer.getMarker())) {
-            movesMade++;
-            return true;
+    const resetGame = () => {
+        document.body.innerHTML = '';
+        createTitle("Tic-Tac-Toe");
+        GameBoard.resetBoard();
+        let board = GameBoard.makeBoard();
+        for (let i = 0; i < 9; i++) {
+            board.appendChild(GameBoard.makeSquare(i));
         }
-        return false;
+        document.body.appendChild(board);
     };
 
-    return { getCurrentPlayer, switchPlayer, playMove, getMovesMade: () => movesMade };
+    return { getCurrentPlayer, switchPlayer, resetGame };
 })();
 
-const GameFlow = function () {
-    console.log("Welcome to Tic-Tac-Toe!");
-    console.log("Player 1 (X) goes first. Enter a number (1-9) to place your marker.");
-
-    const playTurn = () => {
-        console.table(GameBoard.getBoard());
-        // console.table(GameBoard.getBoard().slice(0, 3));
-        // console.table(GameBoard.getBoard().slice(3, 6));
-        // console.table(GameBoard.getBoard().slice(6, 9));
-
-        let move = Number(prompt(`${GameController.getCurrentPlayer().getName()}, enter a grid cell (1-9):`));
-        while (isNaN(move) || move < 1 || move > 9 || !GameBoard.placeMarker(move, GameController.getCurrentPlayer().getMarker())) {
-            move = Number(prompt("Invalid input or spot taken. Enter a valid grid cell (1-9):"));
-        }
-
-        GameController.playMove(move);
-
-        let result = GameBoard.checkWinner();
-        if (result) {
-            console.table(GameBoard.getBoard());
-            if (result === 'draw') {
-                console.log("It's a draw!");
-            } else {
-                console.log(`Game over! ${result} wins!`);
-            }
-            return;
-        }
-
-        GameController.switchPlayer();
-        playTurn();
-    };
-
-    playTurn();
+const GameFlow = () => {
+    GameController.resetGame();
+    console.log("Welcome to Tic-Tac-Toe! Player 1 (X) goes first.");
 };
 
 GameFlow();
