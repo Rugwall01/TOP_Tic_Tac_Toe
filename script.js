@@ -80,12 +80,14 @@ const GameBoard = (() => {
     };
 
     const resetBoard = () => {
+        document.querySelectorAll('.game-square').forEach(square => square.textContent = '');
+
         gameBoard.fill('');
         gameOver = false;
     };
     
 
-    return { gameBoard, makeBoard, makeSquare, checkWinner, resetBoard };
+    return { gameBoard, gameOver, makeBoard, makeSquare, checkWinner, resetBoard };
 })();
 
 const GameController = (() => {
@@ -100,14 +102,12 @@ const GameController = (() => {
         document.body.innerHTML = '';
         createTitle("Tic-Tac-Toe");
         GameBoard.resetBoard();
-        gameOver = false;
+        GameBoard.gameOver = false;
         let board = GameBoard.makeBoard();
         for (let i = 0; i < 9; i++) {
             board.appendChild(GameBoard.makeSquare(i));
         }
         document.body.appendChild(board);
-
-        // confetti.reset()
     };
 
     const completeGame = (message) => {
@@ -202,10 +202,11 @@ const GameController = (() => {
             });
           }
           
-          shoot();
-          shoot();
-          shoot();
-     }
+          for (let i = 0; i < 3; i++) {
+            shoot();
+        };
+
+     };
 
     return { getCurrentPlayer, switchPlayer, resetGame, completeGame, triggerConfetti };
 })();
