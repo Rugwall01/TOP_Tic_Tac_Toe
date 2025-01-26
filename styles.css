@@ -1,0 +1,117 @@
+* {
+    box-sizing: border-box;
+
+}
+
+body {
+    font-family: monospace;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+
+h1 {
+    font-size: 50px;
+
+}
+
+.game-board {
+    height: 450px;
+    width: 450px;
+    display: grid;
+    grid-template-columns: repeat(3, 150px);
+    grid-template-rows: repeat(3, 150px);
+    justify-items: center;
+    align-items: center;
+
+}
+
+
+.game-square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 100px;
+    height: 100%;
+    width: 100%;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    cursor: pointer;
+
+}
+
+.game-square:hover {
+    background-color: lightgray;
+
+}
+
+.game-square:active {
+    background-color: rgba(255, 0, 191, 0.726);
+}
+
+
+.game-square:nth-child(3n) {
+    border-right: none;
+}
+
+.game-square:nth-child(n + 7) {
+    border-bottom: none;
+    
+}
+
+
+body {
+    margin: 0;
+    height: 100vh;
+    background-color: #f0f0f0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* .congratulations {
+    animation: confetti-fall 4s infinite;
+  }
+  
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(-100vh);
+    }
+    100% {
+      transform: translateY(100vh);
+    }
+  }
+  
+  .congratulations::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 0, 0, 0.9), rgba(0, 0, 255, 0.9), rgba(0, 255, 0, 0.9), rgba(255, 255, 0, 0.9));
+    animation: confetti 3s infinite ease-in-out;
+  }
+  
+  @keyframes confetti {
+    0% {
+      left: -10%;
+      top: -5%;
+      opacity: 1;
+      transform: rotate(45deg);
+    }
+    50% {
+      left: 50%;
+      top: 50%;
+      opacity: 0.8;
+      transform: rotate(-45deg);
+    }
+    100% {
+      left: 110%;
+      top: 100%;
+      opacity: 0;
+      transform: rotate(90deg);
+    }
+  } */

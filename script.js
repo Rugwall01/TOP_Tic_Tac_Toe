@@ -51,7 +51,7 @@ const GameBoard = (() => {
                 gameOver = true;
                 setTimeout(() => {
 
-                    completeGame(result === 'draw' ? "It's a draw!" : `${result} wins!`);
+                    GameController.completeGame(result === 'draw' ? "It's a draw!" : `${result} wins!`);
                 }, 100);
                 return;
             }
@@ -83,6 +83,7 @@ const GameBoard = (() => {
         gameBoard.fill('');
         gameOver = false;
     };
+    
 
     return { gameBoard, makeBoard, makeSquare, checkWinner, resetBoard };
 })();
@@ -109,7 +110,104 @@ const GameController = (() => {
         // confetti.reset()
     };
 
-    return { getCurrentPlayer, switchPlayer, resetGame };
+    const completeGame = (message) => {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.right = '0';
+        overlay.style.bottom = '0';
+        overlay.style.left = '0';
+        overlay.style.backgroundColor = 'rgba(0,0,0,.75)';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.textAlign = 'center';
+    
+        const completeMessage = document.createElement('h2');
+            completeMessage.textContent = message;
+            completeMessage.style.color = 'white';
+            completeMessage.style.fontSize = '100px';
+            completeMessage.style.fontFamily = 'monospace';
+    
+    
+            overlay.appendChild(completeMessage);
+    
+    
+        
+    
+        const restartBtn = document.createElement('button');
+    
+        restartBtn.textContent = "Restart";
+        restartBtn.style.backgroundColor = 'transparent';
+        restartBtn.style.color = 'white';
+        restartBtn.style.border = '1px solid white';
+        restartBtn.style.padding = '10px 30px';
+        restartBtn.style.fontSize = '30px';
+    
+        
+    
+        overlay.appendChild(restartBtn);
+    
+        document.body.appendChild(overlay);
+    
+        triggerConfetti();
+    
+        restartBtn.addEventListener('click', () => {
+            document.body.removeChild(overlay);
+            GameFlow();
+    
+        });
+    
+    
+     };
+    
+     const triggerConfetti = () => {
+    
+        confetti({
+            particleCount: 350,
+            spread: 90,
+            origin: { x: 0.05, y: 0.9 },
+          });
+    
+          confetti({
+            particleCount: 350,
+            spread: 90,
+            origin: { x: .95, y: 0.9 },
+          });
+    
+          const defaults = {
+            spread: 360,
+            ticks: 50,
+            gravity: 0,
+            decay: 0.94,
+            startVelocity: 30,
+            shapes: ["star"],
+            colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+          };
+          
+          function shoot() {
+            confetti({
+              ...defaults,
+              particleCount: 60,
+              scalar: 1.2,
+              shapes: ["star"],
+            });
+          
+            confetti({
+              ...defaults,
+              particleCount: 20,
+              scalar: 0.75,
+              shapes: ["circle"],
+            });
+          }
+          
+          shoot();
+          shoot();
+          shoot();
+     }
+
+    return { getCurrentPlayer, switchPlayer, resetGame, completeGame, triggerConfetti };
 })();
 
 const GameFlow = () => {
@@ -118,104 +216,5 @@ const GameFlow = () => {
 };
 
 
-
-
-
-const completeGame = (message) => {
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.right = '0';
-    overlay.style.bottom = '0';
-    overlay.style.left = '0';
-    overlay.style.backgroundColor = 'rgba(0,0,0,.75)';
-    overlay.style.display = 'flex';
-    overlay.style.flexDirection = 'column';
-    overlay.style.justifyContent = 'center';
-    overlay.style.alignItems = 'center';
-    overlay.style.textAlign = 'center';
-
-    const completeMessage = document.createElement('h2');
-        completeMessage.textContent = message;
-        completeMessage.style.color = 'white';
-        completeMessage.style.fontSize = '100px';
-        completeMessage.style.fontFamily = 'monospace';
-
-
-        overlay.appendChild(completeMessage);
-
-
-    
-
-    const restartBtn = document.createElement('button');
-
-    restartBtn.textContent = "Restart";
-    restartBtn.style.backgroundColor = 'transparent';
-    restartBtn.style.color = 'white';
-    restartBtn.style.border = '1px solid white';
-    restartBtn.style.padding = '10px 30px';
-    restartBtn.style.fontSize = '30px';
-
-    
-
-    overlay.appendChild(restartBtn);
-
-    document.body.appendChild(overlay);
-
-    triggerConfetti();
-
-    restartBtn.addEventListener('click', () => {
-        document.body.removeChild(overlay);
-        GameFlow();
-
-    });
-
-
- };
-
- const triggerConfetti = () => {
-
-    confetti({
-        particleCount: 350,
-        spread: 90,
-        origin: { x: 0.05, y: 0.9 },
-      });
-
-      confetti({
-        particleCount: 350,
-        spread: 90,
-        origin: { x: .95, y: 0.9 },
-      });
-
-      const defaults = {
-        spread: 360,
-        ticks: 50,
-        gravity: 0,
-        decay: 0.94,
-        startVelocity: 30,
-        shapes: ["star"],
-        colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
-      };
-      
-      function shoot() {
-        confetti({
-          ...defaults,
-          particleCount: 60,
-          scalar: 1.2,
-          shapes: ["star"],
-        });
-      
-        confetti({
-          ...defaults,
-          particleCount: 20,
-          scalar: 0.75,
-          shapes: ["circle"],
-        });
-      }
-      
-      shoot();
-      shoot();
-      shoot();
- }
 
 GameFlow();
